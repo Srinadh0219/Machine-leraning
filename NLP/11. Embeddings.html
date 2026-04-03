@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chapter 11: Word Embeddings</title>
+  <style>
+    body {
+      font-family: Georgia, serif;
+      line-height: 1.8;
+      margin: 40px;
+      background-color: #fff;
+      color: #2c3e50;
+    }
+    h1, h2, h3 {
+      color: #1a1a1a;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #444;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+    code, pre {
+      background-color: #eef;
+      padding: 6px;
+      border-radius: 4px;
+      display: block;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Chapter 11: Word Embeddings</h1>
+
+
+<h2>1. What Are Word Embeddings?</h2>
+<p>
+Imagine you are analyzing text using a machine learning model. Computers understand numbers, not words. So, we must convert words into a numerical form—this is where word embeddings come in.
+</p>
+
+<p>
+Traditional text vectorization techniques like One-Hot Encoding or Bag-of-Words do not capture the meaning or relationships between words. Word embeddings are dense vector representations of words that encapsulate their semantic meaning based on context. This chapter introduces two major word embedding techniques: <strong>Word2Vec</strong> and <strong>GloVe</strong>.
+</p>
+
+<h2>2. Word2Vec</h2>
+<p>
+Developed by Google in 2013, Word2Vec is a group of models that learn to represent words using shallow neural networks. The idea is simple: <em>words appearing in similar contexts should have similar representations</em>.
+</p>
+
+<h3>2.1 Continuous Bag-of-Words (CBOW)</h3>
+<p>
+The CBOW model tries to predict a target word from its surrounding context. For example:
+</p>
+
+<p><strong>Sentence:</strong> "The cat sat on the mat."</p>
+<p><strong>Context Words:</strong> "The", "cat", "on", "the", "mat"</p>
+<p><strong>Target Word:</strong> "sat"</p>
+
+<p>
+The CBOW model uses the context words to predict "sat". This process is repeated for every word in the corpus.
+</p>
+
+<h4>How It Works:</h4>
+<ul>
+  <li><strong>Input:</strong> One-hot vectors of context words</li>
+  <li><strong>Hidden Layer:</strong> Shared weights that act as the embedding</li>
+  <li><strong>Output:</strong> A probability distribution over vocabulary to predict the target word</li>
+</ul>
+
+<h4>Example:</h4>
+<pre><code>Input: ["The", "cat", "on", "the", "mat"]
+Target: "sat"</code></pre>
+
+<p>
+The model learns that "sat" is often surrounded by those words, hence embedding vectors will reflect this association.
+</p>
+
+<h3>2.2 Skip-gram</h3>
+<p>
+The Skip-gram model flips the CBOW architecture. Instead of predicting the target word from context, it uses a target word to predict its context.
+</p>
+
+<p><strong>Sentence:</strong> "The cat sat on the mat."</p>
+<p><strong>Target Word:</strong> "cat"</p>
+<p><strong>Predicted Context:</strong> "The", "sat"</p>
+
+<h4>How It Works:</h4>
+<ul>
+  <li><strong>Input:</strong> One-hot vector of the target word</li>
+  <li><strong>Hidden Layer:</strong> Embedding weights</li>
+  <li><strong>Output:</strong> Predicts several context words for the input word</li>
+</ul>
+
+<h4>Example:</h4>
+<pre><code>Input: "cat"
+Predicted Context: ["The", "sat"]</code></pre>
+
+<p>
+This helps capture deeper semantic relationships, especially for rare words.
+</p>
+
+
+<h2>3. GloVe (Global Vectors for Word Representation)</h2>
+<p>
+GloVe, developed by Stanford in 2014, is a count-based model that captures global statistics of word co-occurrences. While Word2Vec focuses on local context windows, GloVe uses the entire corpus.
+</p>
+
+<h4>Example Intuition:</h4>
+<p>
+Let’s consider the words "ice" and "steam". GloVe notices that "ice" co-occurs more with "cold", "solid", and "snow", while "steam" co-occurs more with "hot", "gas", and "boil".
+</p>
+
+<pre><code>
+P(solid | ice) = high, P(solid | steam) = low
+P(gas | ice) = low, P(gas | steam) = high
+
+Ratio: P(solid | ice) / P(solid | steam) → Large
+</code></pre>
+
+<p>
+GloVe uses such ratios to train embeddings that reflect these nuanced relationships.
+</p>
+
+<h3>How GloVe Works:</h3>
+<ol>
+  <li>Build a co-occurrence matrix where <code>X_ij</code> is the number of times word <code>i</code> appears with word <code>j</code>.</li>
+  <li>Train the model so that <code>w_i^T * w_j ≈ log(X_ij)</code>.</li>
+  <li>Use a weighting function to reduce the impact of very frequent or rare pairs.</li>
+</ol>
+
+<h3>Example:</h3>
+<p>
+If the word "king" often appears with "royal", "crown", "monarch", and "queen", its vector will reflect that similarity. And you might see famous results like:
+</p>
+
+<pre><code>king - man + woman ≈ queen</code></pre>
+
+<h2>4. Key Differences: Word2Vec vs GloVe</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Word2Vec</th>
+      <th>GloVe</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Approach</td>
+      <td>Predictive (neural network)</td>
+      <td>Count-based (matrix factorization)</td>
+    </tr>
+    <tr>
+      <td>Context</td>
+      <td>Local (context window)</td>
+      <td>Global (co-occurrence matrix)</td>
+    </tr>
+    <tr>
+      <td>Objective</td>
+      <td>Predict context/word</td>
+      <td>Approximate co-occurrence log counts</td>
+    </tr>
+    <tr>
+      <td>Training</td>
+      <td>On-the-fly, with sampling</td>
+      <td>Requires full matrix upfront</td>
+    </tr>
+    <tr>
+      <td>Strength</td>
+      <td>Good with rare words</td>
+      <td>Great at analogies</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5. Summary</h2>
+<p>
+Word embeddings enable machines to understand language in a meaningful way by representing words in a dense vector space. Word2Vec (CBOW and Skip-gram) and GloVe are two of the most important methods that brought significant progress in NLP tasks like semantic similarity, analogy solving, and downstream tasks like classification and translation.
+</p>
+
+<p><strong>Next Step:</strong> Explore how to use pre-trained Word2Vec or GloVe embeddings in real-world NLP projects using frameworks like TensorFlow, PyTorch, or spaCy.</p>
+
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+ <title>Chapter 10: Fundamentals of Text Representation in NLP</title>
+  <style>
+    body {
+      font-family: "Georgia", serif;
+      line-height: 1.6;
+      margin: 40px;
+      background: #f9f9f9;
+      color: #333;
+    }
+    h1, h2, h3 {
+      color: #2c3e50;
+    }
+    h1 {
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 0.3em;
+    }
+    table {
+      border-collapse: collapse;
+      width: 90%;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    code {
+      background: #eee;
+      padding: 2px 4px;
+      font-family: "Courier New", monospace;
+    }
+    blockquote {
+      border-left: 4px solid #ccc;
+      padding-left: 1em;
+      color: #555;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Chapter 10: Fundamentals of Text Representation in NLP</h1>
+
+<h2>10.1. Introduction: Why We Need Text Representation</h2>
+<p>Natural Language Processing (NLP) seeks to enable machines to understand and work with human language. However, computers process <strong>numbers</strong>, not words. To bridge this gap, we need <strong>text representation</strong>—a way to convert language into numerical data while retaining as much <strong>meaning</strong> and <strong>structure</strong> as possible.</p>
+
+<h2>10.2. Why Text Must Be Converted to Numbers</h2>
+<p>Most machine learning algorithms expect numerical input in the form of vectors or matrices. So a natural language modelling technique like Word Embedding is used to map words or phrases from a vocabulary to a corresponding vector of real numbers. As well as being amenable to processing by ML algorithms, this vector representation has two important and advantageous properties:
+</p>
+<ul>
+  <li>Dimensionality Reduction - it is a more efficient representation
+  <li>Contextual Similarity - Preserve semantic meaning, it is a more expressive representation"
+</ul>
+
+
+<h2>10.3. Foundational Techniques in Text Representation</h2>
+
+<h3>10.3.1 One-Hot Encoding</h3>
+<p>Each word is represented by a binary vector with one element set to 1 and the rest 0.</p>
+<p><strong>Example:</strong><br>
+
+<p><strong>Sentences:</strong></p>
+<ol>
+  <li>I love NLP</li>
+  <li>NLP loves me</li>
+</ol>
+
+<p><strong>Vocabulary:</strong> ["I", "love", "NLP", "loves", "me"]</p>
+
+<table>
+  <tr><th>Word</th><th>Index</th></tr>
+  <tr><td>I</td><td>0</td></tr>
+  <tr><td>love</td><td>1</td></tr>
+  <tr><td>NLP</td><td>2</td></tr>
+  <tr><td>loves</td><td>3</td></tr>
+  <tr><td>me</td><td>4</td></tr>
+</table>
+
+<h3>Sentence 1: "I love NLP"</h3>
+<table>
+  <tr><th>Word</th><th>One-Hot Vector</th></tr>
+  <tr><td>I</td><td>[1, 0, 0, 0, 0]</td></tr>
+  <tr><td>love</td><td>[0, 1, 0, 0, 0]</td></tr>
+  <tr><td>NLP</td><td>[0, 0, 1, 0, 0]</td></tr>
+</table>
+
+<h3>Sentence 2: "NLP loves me"</h3>
+<table>
+  <tr><th>Word</th><th>One-Hot Vector</th></tr>
+  <tr><td>NLP</td><td>[0, 0, 1, 0, 0]</td></tr>
+  <tr><td>loves</td><td>[0, 0, 0, 1, 0]</td></tr>
+  <tr><td>me</td><td>[0, 0, 0, 0, 1]</td></tr>
+</table>
+<p><strong>✅ Easy to implement</strong><br>
+<strong>❌ No similarity captured; high dimensionality</strong></p>
+
+<h3>10.3.2 Count Vectorizer (Bag-of-Words)</h3>
+<p>Represents documents by counting how many times each word appears, ignoring grammar and order.</p>
+<p><strong>Example:</strong><br>
+<p><strong>Sentences:</strong></p>
+<ol>
+  <li>I love NLP</li>
+  <li>NLP loves me</li>
+</ol>
+
+<p><strong>Vocabulary:</strong> ["i", "love", "nlp", "loves", "me"]</p>
+
+<table>
+  <tr>
+    <th>Word</th>
+    <th>Sentence 1 ("I love NLP")</th>
+    <th>Sentence 2 ("NLP loves me")</th>
+  </tr>
+  <tr><td>i</td><td>1</td><td>0</td></tr>
+  <tr><td>love</td><td>1</td><td>0</td></tr>
+  <tr><td>nlp</td><td>1</td><td>1</td></tr>
+  <tr><td>loves</td><td>0</td><td>1</td></tr>
+  <tr><td>me</td><td>0</td><td>1</td></tr>
+</table>
+
+<h3>Vector Representation</h3>
+<ul>
+  <li><strong>Sentence 1:</strong> [1, 1, 1, 0, 0]</li>
+  <li><strong>Sentence 2:</strong> [0, 0, 1, 1, 1]</li>
+</ul>
+
+<p>This representation is called the <strong>Bag-of-Words</strong> model, where we count the number of times each word appears in a document.</p>
+
+<p><strong>✅ Simple and effective</strong><br>
+<strong>❌ Ignores order and meaning</strong></p>
+
+<h3>10.3.3 N-grams</h3>
+<p>Captures short sequences of adjacent words to include some sense of context.</p>
+<p><strong>Example:</strong><br>
+<p><strong>Sentences:</strong></p>
+<ol>
+  <li>I love NLP</li>
+  <li>NLP loves me</li>
+</ol>
+
+<h3>Step 1: Extracted Bigrams</h3>
+<ul>
+  <li><code>I love NLP</code> → "I love", "love NLP"</li>
+  <li><code>NLP loves me</code> → "NLP loves", "loves me"</li>
+</ul>
+
+<h3>Step 2: Bigram Vocabulary</h3>
+<p>["I love", "love NLP", "NLP loves", "loves me"]</p>
+
+<h3>Step 3: Vector Representation</h3>
+
+<table>
+  <tr>
+    <th>Bigram</th>
+    <th>Sentence 1 ("I love NLP")</th>
+    <th>Sentence 2 ("NLP loves me")</th>
+  </tr>
+  <tr><td>I love</td><td>1</td><td>0</td></tr>
+  <tr><td>love NLP</td><td>1</td><td>0</td></tr>
+  <tr><td>NLP loves</td><td>0</td><td>1</td></tr>
+  <tr><td>loves me</td><td>0</td><td>1</td></tr>
+</table>
+
+<h3>Final Vectors</h3>
+<ul>
+  <li><strong>Sentence 1:</strong> [1, 1, 0, 0]</li>
+  <li><strong>Sentence 2:</strong> [0, 0, 1, 1]</li>
+</ul>
+
+<p>This representation captures the sequence of two consecutive words, making it more informative than single-word models.</p>
+
+<p><strong>✅ Captures local patterns</strong><br>
+<strong>❌ Rapid vocabulary growth with larger 'n'</strong></p>
+
+<h3>10.3.4 TF-IDF (Term Frequency–Inverse Document Frequency)</h3>
+<p>Enhances Count Vectorizer by weighing words based on importance.</p>
+<ul>
+  <li><strong>TF (Term Frequency):</strong> Frequency of the word in the document</li>
+  <li><strong>IDF (Inverse Document Frequency):</strong> Rarity of the word across documents</li>
+</ul>
+<p><strong>Example:</strong><br>
+<p><strong>Sentences:</strong></p>
+<ol>
+  <li>I love NLP</li>
+  <li>NLP loves me</li>
+</ol>
+
+<h3>Step 1: Vocabulary</h3>
+<p>["I", "love", "NLP", "loves", "me"]</p>
+
+<h3>Step 2: Term Frequency (TF)</h3>
+<table>
+  <tr>
+    <th>Word</th>
+    <th>Sentence 1</th>
+    <th>Sentence 2</th>
+  </tr>
+  <tr><td>I</td><td>1/3</td><td>0</td></tr>
+  <tr><td>love</td><td>1/3</td><td>0</td></tr>
+  <tr><td>NLP</td><td>1/3</td><td>1/3</td></tr>
+  <tr><td>loves</td><td>0</td><td>1/3</td></tr>
+  <tr><td>me</td><td>0</td><td>1/3</td></tr>
+</table>
+
+<h3>Step 3: Inverse Document Frequency (IDF)</h3>
+<p>Total documents (N) = 2</p>
+<table>
+  <tr>
+    <th>Word</th>
+    <th>df(w)</th>
+    <th>IDF = ln(2 / df(w))</th>
+  </tr>
+  <tr><td>I</td><td>1</td><td>0.693</td></tr>
+  <tr><td>love</td><td>1</td><td>0.693</td></tr>
+  <tr><td>NLP</td><td>2</td><td>0</td></tr>
+  <tr><td>loves</td><td>1</td><td>0.693</td></tr>
+  <tr><td>me</td><td>1</td><td>0.693</td></tr>
+</table>
+
+<h3>Step 4: TF-IDF = TF × IDF</h3>
+<table>
+  <tr>
+    <th>Word</th>
+    <th>Sentence 1 (TF-IDF)</th>
+    <th>Sentence 2 (TF-IDF)</th>
+  </tr>
+  <tr><td>I</td><td>0.231</td><td>0</td></tr>
+  <tr><td>love</td><td>0.231</td><td>0</td></tr>
+  <tr><td>NLP</td><td>0.0</td><td>0.0</td></tr>
+  <tr><td>loves</td><td>0</td><td>0.231</td></tr>
+  <tr><td>me</td><td>0</td><td>0.231</td></tr>
+</table>
+
+<h3>Final TF-IDF Vectors</h3>
+<ul>
+  <li><strong>Sentence 1:</strong> [0.231, 0.231, 0.0, 0.0, 0.0]</li>
+  <li><strong>Sentence 2:</strong> [0.0, 0.0, 0.0, 0.231, 0.231]</li>
+</ul>
+
+<p>TF-IDF emphasizes important terms in each sentence and reduces the impact of common words like "NLP", which appears in both.</p>
+
+<p><strong>✅ Downplays common words</strong><br>
+<strong>❌ Still sparse; doesn’t capture meaning</strong></p>
+
+<h2>10.4. Dense Representations: Word Embeddings</h2>
+
+<p>Traditional methods are sparse and miss meaning. <strong>Word embeddings</strong> solve this by mapping words into low-dimensional, dense vectors.</p>
+<p><strong>Word embeddings</strong> are dense, low-dimensional vector representations of words that capture semantic relationships. Unlike sparse vectors from One-Hot or BoW, embeddings learn patterns and context from large text data.</p>
+
+<h3>10.4.1 Word Embeddings (Concept)</h3>
+<p>Words are placed in a vector space where similar words are close together.</p>
+<p><strong>Example:</strong><br>
+<table>
+  <tr>
+    <th>Word</th>
+    <th>Vector</th>
+  </tr>
+  <tr><td>king</td><td>[0.8, 0.2, 0.6]</td></tr>
+  <tr><td>queen</td><td>[0.9, 0.1, 0.7]</td></tr>
+  <tr><td>man</td><td>[0.7, 0.3, 0.5]</td></tr>
+  <tr><td>woman</td><td>[0.9, 0.1, 0.6]</td></tr>
+</table>
+
+<h3>Vector Arithmetic Analogy</h3>
+<p><code>king - man + woman ≈ queen</code></p>
+<pre>
+[0.8, 0.2, 0.6] 
+- [0.7, 0.3, 0.5] 
++ [0.9, 0.1, 0.6] 
+= [1.0, 0.0, 0.7] ≈ queen → [0.9, 0.1, 0.7]
+</pre>
+
+<h3>Python Example using Gensim Word2Vec</h3>
+<pre><code>from gensim.models import Word2Vec
+
+sentences = [
+    ["king", "queen", "man", "woman"],
+    ["paris", "france", "rome", "italy"],
+    ["apple", "banana", "orange", "fruit"],
+]
+
+model = Word2Vec(sentences, vector_size=3, window=2, min_count=1, sg=1)
+
+print("Vector for 'king':", model.wv['king'])
+print("Similar to 'king':", model.wv.most_similar('king'))
+print("king - man + woman ≈", model.wv.most_similar(positive=['king', 'woman'], negative=['man']))
+</code></pre>
+<strong>✅ Low dimensional</strong><br>
+<strong>❌ Needs training or pre-trained models</strong></p>
+
+<h2>10.5. Summary Table</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Method</th>
+      <th>Captures Word Order?</th>
+      <th>Captures Meaning?</th>
+      <th>Dense?</th>
+      <th>Use Case</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>One-Hot</td>
+      <td>❌</td>
+      <td>❌</td>
+      <td>❌</td>
+      <td>Introductory demos</td>
+    </tr>
+    <tr>
+      <td>BoW</td>
+      <td>❌</td>
+      <td>❌</td>
+      <td>❌</td>
+      <td>Basic classification</td>
+    </tr>
+    <tr>
+      <td>N-grams</td>
+      <td>✅ (local)</td>
+      <td>❌</td>
+      <td>❌</td>
+      <td>Language modeling</td>
+    </tr>
+    <tr>
+      <td>TF-IDF</td>
+      <td>❌</td>
+      <td>❌ (partial)</td>
+      <td>❌</td>
+      <td>Search, retrieval</td>
+    </tr>
+    <tr>
+      <td>Word Embeddings</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td>Modern NLP tasks</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>10.6. Conclusion: From Tokens to Meaning</h2>
+<p>Text representation has evolved from basic binary and count-based models to sophisticated dense embeddings. While foundational techniques like One-Hot and TF-IDF are still useful in some scenarios, modern NLP systems increasingly rely on <strong>word embeddings</strong> to unlock semantic understanding.</p>
+
+<p>Techniques like GloVe serve as stepping stones to even more advanced methods like contextual embeddings (<strong>ELMo</strong>, <strong>BERT</strong>, <strong>GPT models</strong>), where a word’s vector changes depending on context. Understanding the basics of text representation is essential for building intelligent language systems.</p>
+
+</body>
+</html>
+
